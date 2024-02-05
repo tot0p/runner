@@ -109,29 +109,25 @@ func main() {
 		}
 	}(client)
 
-	session, err := client.NewSession()
-	if err != nil {
-		err2 := api.DeleteInstance(i.ID)
-		if err2 != nil {
-			panic(err2)
-		}
-		fmt.Println("Instance deleted")
-		panic(err)
-	}
-
-	defer func(session *ssh.Session) {
-		err := session.Close()
-		if err != nil {
-			panic(err)
-		}
-	}(session)
-
 	// run commands
 	cmds := []string{
-		"echo 'hello world'",
+		"echo 'hello world';",
 		"apt update",
 		"apt install -y git",
 	}
+
+	session, err := client.NewSession()
+	if err != nil {
+		if err != nil {
+			err2 := api.DeleteInstance(i.ID)
+			if err2 != nil {
+				panic(err2)
+			}
+			fmt.Println("Instance deleted")
+		}
+		panic(err)
+	}
+
 	for _, cmd := range cmds {
 		fmt.Println("Running command: ", cmd)
 		out, err := session.CombinedOutput(cmd)
@@ -141,6 +137,44 @@ func main() {
 		} else {
 			fmt.Println(string(out))
 		}
+
+		err = session.Close()
+		if err != nil {
+			if err != nil {
+				err2 := api.DeleteInstance(i.ID)
+				if err2 != nil {
+					panic(err2)
+				}
+				fmt.Println("Instance deleted")
+			}
+			panic(err)
+		}
+		session, err = client.NewSession()
+		if err != nil {
+			if err != nil {
+				err2 := api.DeleteInstance(i.ID)
+				if err2 != nil {
+					panic(err2)
+				}
+				fmt.Println("Instance deleted")
+			}
+			panic(err)
+		}
+
+		time.Sleep(5 * time.Second)
+
+	}
+
+	err = session.Close()
+	if err != nil {
+		if err != nil {
+			err2 := api.DeleteInstance(i.ID)
+			if err2 != nil {
+				panic(err2)
+			}
+			fmt.Println("Instance deleted")
+		}
+		panic(err)
 	}
 
 	for {
