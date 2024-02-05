@@ -61,12 +61,5 @@ func (v *Vutlr) request(r request) *http.Response {
 		panic(err)
 	}
 
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			panic(err)
-		}
-	}(resp.Body)
-
 	return resp
 }

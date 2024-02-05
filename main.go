@@ -15,4 +15,5 @@ func init() {
 func main() {
 	vultr := vutlr.New()
 	vultr.SetAPIKey(env.Get("API_KEY"))
+	vultr.ListInstances()
 }
