@@ -3,6 +3,7 @@ package vutlr
 import (
 	"encoding/json"
 	"io"
+	"strings"
 )
 
 type Instance struct {
@@ -68,4 +69,70 @@ func (v *Vutlr) ListInstances() ListInstancesResponse {
 		panic(err)
 	}
 	return response
+}
+
+// CreateInstance = /v2/instances
+
+type InstanceCreateBodyRequest struct {
+	Region   string   `json:"region"`
+	Plan     string   `json:"plan"`
+	Label    string   `json:"label"`
+	OsID     int      `json:"os_id"`
+	UserData string   `json:"user_data"`
+	Backups  string   `json:"backups"`
+	Hostname string   `json:"hostname"`
+	Tags     []string `json:"tags"`
+}
+
+func (i *InstanceCreateBodyRequest) ToJson() []byte {
+	bytes, err := json.Marshal(i)
+	if err != nil {
+		panic(err)
+	}
+	return bytes
+}
+
+func NewInstanceCreateBodyRequest(region string, plan string, label string, osID int, userData string, backups string, hostname string, tags []string) InstanceCreateBodyRequest {
+	return InstanceCreateBodyRequest{
+		Region:   region,
+		Plan:     plan,
+		Label:    label,
+		OsID:     osID,
+		UserData: userData,
+		Backups:  backups,
+		Hostname: hostname,
+		Tags:     tags,
+	}
+}
+
+func InstanceCreateBodyRequestFromJson(data []byte) InstanceCreateBodyRequest {
+	var body InstanceCreateBodyRequest
+	err := json.Unmarshal(data, &body)
+	if err != nil {
+		panic(err)
+	}
+	return body
+}
+
+func (v *Vutlr) CreateInstance(r InstanceCreateBodyRequest) Instance {
+	bodyR := io.NopCloser(strings.NewReader(string(r.ToJson())))
+	resp := v.request(newRequest(v.rootAPI+"/instances", "POST", bodyR))
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			panic(err)
+		}
+	}(resp.Body)
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
+	var response struct {
+		Instance Instance `json:"instance"`
+	}
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		panic(err)
+	}
+	return response.Instance
 }
