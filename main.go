@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"runner/vutlr"
+	"slices"
 	"strings"
 	"time"
 )
@@ -34,16 +35,20 @@ func main() {
 	fmt.Println("Creating instance... ", i.ID)
 	fmt.Println("Password: ", i.DefaultPassword)
 
-	lastStatus := "none"
-	for i.ServerStatus != "ok" {
+	lastStatus := []string{"none"}
+	repass := true
+	for i.ServerStatus != "ok" && repass {
 		i, err = api.GetInstance(i.ID)
 		if err != nil {
 			panic(err)
 		}
 		time.Sleep(1 * time.Second)
-		if i.ServerStatus != lastStatus {
+		if i.ServerStatus != lastStatus[0] {
 			fmt.Println(i.ServerStatus)
-			lastStatus = i.ServerStatus
+			if slices.Contains(lastStatus, i.ServerStatus) {
+				repass = false
+			}
+			lastStatus = append(lastStatus, i.ServerStatus)
 		}
 	}
 
@@ -66,7 +71,7 @@ func main() {
 
 	for {
 		fmt.Print(">>")
-		var cmd string
+		var cmd string = ""
 		_, err := fmt.Scanln(&cmd)
 		if err != nil {
 			err2 := api.DeleteInstance(i.ID)
@@ -76,7 +81,7 @@ func main() {
 			fmt.Println("Instance deleted")
 			panic(err)
 		}
-		cmd = strings.ToLower(cmd[:len(cmd)-1])
+		cmd = strings.ToLower(cmd)
 		switch cmd {
 		case "quit":
 			err := api.DeleteInstance(i.ID)
