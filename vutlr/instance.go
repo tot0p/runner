@@ -2,6 +2,7 @@ package vutlr
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"strings"
 )
@@ -73,49 +74,8 @@ func (v *Vutlr) ListInstances() ListInstancesResponse {
 
 // CreateInstance = /v2/instances
 
-type InstanceCreateBodyRequest struct {
-	Region   string   `json:"region"`
-	Plan     string   `json:"plan"`
-	Label    string   `json:"label"`
-	OsID     int      `json:"os_id"`
-	UserData string   `json:"user_data"`
-	Backups  string   `json:"backups"`
-	Hostname string   `json:"hostname"`
-	Tags     []string `json:"tags"`
-}
-
-func (i *InstanceCreateBodyRequest) ToJson() []byte {
-	bytes, err := json.Marshal(i)
-	if err != nil {
-		panic(err)
-	}
-	return bytes
-}
-
-func NewInstanceCreateBodyRequest(region string, plan string, label string, osID int, userData string, backups string, hostname string, tags []string) InstanceCreateBodyRequest {
-	return InstanceCreateBodyRequest{
-		Region:   region,
-		Plan:     plan,
-		Label:    label,
-		OsID:     osID,
-		UserData: userData,
-		Backups:  backups,
-		Hostname: hostname,
-		Tags:     tags,
-	}
-}
-
-func InstanceCreateBodyRequestFromJson(data []byte) InstanceCreateBodyRequest {
-	var body InstanceCreateBodyRequest
-	err := json.Unmarshal(data, &body)
-	if err != nil {
-		panic(err)
-	}
-	return body
-}
-
-func (v *Vutlr) CreateInstance(r InstanceCreateBodyRequest) Instance {
-	bodyR := io.NopCloser(strings.NewReader(string(r.ToJson())))
+func (v *Vutlr) CreateInstance(jsonBody string) (Instance, error) {
+	bodyR := io.NopCloser(strings.NewReader(jsonBody))
 	resp := v.request(newRequest(v.rootAPI+"/instances", "POST", bodyR))
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
@@ -127,6 +87,9 @@ func (v *Vutlr) CreateInstance(r InstanceCreateBodyRequest) Instance {
 	if err != nil {
 		panic(err)
 	}
+	if resp.StatusCode/100 != 2 {
+		return Instance{}, fmt.Errorf("error: %s", string(body))
+	}
 	var response struct {
 		Instance Instance `json:"instance"`
 	}
@@ -134,7 +97,7 @@ func (v *Vutlr) CreateInstance(r InstanceCreateBodyRequest) Instance {
 	if err != nil {
 		panic(err)
 	}
-	return response.Instance
+	return response.Instance, nil
 }
 
 // GetInstance = /v2/instances/{instance_id}

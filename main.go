@@ -14,8 +14,25 @@ func init() {
 }
 
 func main() {
-	vultr := vutlr.New()
-	vultr.SetAPIKey(env.Get("API_KEY"))
-	lst := vultr.ListInstances()
+	api := vutlr.New()
+	api.SetAPIKey(env.Get("API_KEY"))
+	/*
+	   	i, err := api.CreateInstance(`{
+	     "region": "ewr",
+	     "plan": "vc2-1c-2gb",
+	     "label": "ApiRunner",
+	     "os_id": 477,
+	     "hostname": "runner"
+	   }
+	   			`)
+	   	if err != nil {
+	   		panic(err)
+	   	}
+	   	fmt.Println(i.ID)
+
+	*/
+
+	lst := api.ListInstances()
 	fmt.Println(lst.Meta.Total)
+
 }
