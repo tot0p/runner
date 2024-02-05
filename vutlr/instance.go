@@ -37,6 +37,8 @@ type Instance struct {
 	UserScheme       string   `json:"user_scheme"`
 }
 
+// ListIntances = /v2/instances
+
 type ListInstancesResponse struct {
 	Instances []Instance `json:"instances"`
 	Meta      struct {
@@ -50,7 +52,12 @@ type ListInstancesResponse struct {
 
 func (v *Vutlr) ListInstances() ListInstancesResponse {
 	resp := v.request(newRequestNoBody(v.rootAPI+"/instances", "GET"))
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			panic(err)
+		}
+	}(resp.Body)
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		panic(err)
