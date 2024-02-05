@@ -35,4 +35,18 @@ func main() {
 	lst := api.ListInstances()
 	fmt.Println(lst.Meta.Total)
 
+	/*
+		id := lst.Instances[0].ID
+
+		fmt.Println(id)
+
+		i, err := api.GetInstance(id)
+		if err != nil {
+			panic(err)
+		}
+
+		fmt.Println(i.ID)
+		fmt.Println(i.Os)
+
+	*/
 }

@@ -102,7 +102,7 @@ func (v *Vutlr) CreateInstance(jsonBody string) (Instance, error) {
 
 // GetInstance = /v2/instances/{instance_id}
 
-func (v *Vutlr) GetInstance(instanceID string) Instance {
+func (v *Vutlr) GetInstance(instanceID string) (Instance, error) {
 	resp := v.request(newRequestNoBody(v.rootAPI+"/instances/"+instanceID, "GET"))
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
@@ -114,6 +114,10 @@ func (v *Vutlr) GetInstance(instanceID string) Instance {
 	if err != nil {
 		panic(err)
 	}
+	if resp.StatusCode/100 != 2 {
+		return Instance{}, fmt.Errorf("error: %s", string(body))
+	}
+
 	var response struct {
 		Instance Instance `json:"instance"`
 	}
@@ -121,5 +125,5 @@ func (v *Vutlr) GetInstance(instanceID string) Instance {
 	if err != nil {
 		panic(err)
 	}
-	return response.Instance
+	return response.Instance, nil
 }
