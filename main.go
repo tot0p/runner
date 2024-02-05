@@ -1,12 +1,13 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/tot0p/env"
+	"golang.org/x/crypto/ssh"
 	"os"
 	"os/signal"
 	"runner/vutlr"
-	"slices"
 	"strings"
 	"time"
 )
@@ -34,21 +35,21 @@ func main() {
 
 	fmt.Println("Creating instance... ", i.ID)
 	fmt.Println("Password: ", i.DefaultPassword)
+	pass := i.DefaultPassword
 
-	lastStatus := []string{"none"}
-	repass := true
-	for i.ServerStatus != "ok" && repass {
+	lastStatus := "none"
+	count := 0
+	for count < 60 {
 		i, err = api.GetInstance(i.ID)
 		if err != nil {
 			panic(err)
 		}
+
 		time.Sleep(1 * time.Second)
-		if i.ServerStatus != lastStatus[0] {
+		count++
+		if i.ServerStatus != lastStatus {
 			fmt.Println(i.ServerStatus)
-			if slices.Contains(lastStatus, i.ServerStatus) {
-				repass = false
-			}
-			lastStatus = append(lastStatus, i.ServerStatus)
+			lastStatus = i.ServerStatus
 		}
 	}
 
@@ -68,6 +69,79 @@ func main() {
 	}()
 
 	// connect to instance by ssh
+	host := i.MainIP + ":22"
+	user := "root"
+	config := &ssh.ClientConfig{
+		User: user,
+		Auth: []ssh.AuthMethod{
+			ssh.Password(pass),
+		},
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+	}
+
+	var client *ssh.Client = nil
+	err = errors.New("not nil")
+	count = 0
+
+	for err != nil && count < 5 {
+		client, err = ssh.Dial("tcp", host, config)
+		if err != nil {
+			fmt.Println("Retrying...")
+			time.Sleep(2 * time.Second)
+			count++
+		}
+	}
+
+	if client == nil {
+		err2 := api.DeleteInstance(i.ID)
+		if err2 != nil {
+			panic(err2)
+		}
+		fmt.Println("Instance deleted")
+		panic(err)
+	}
+	fmt.Println("Connected to instance")
+
+	defer func(client *ssh.Client) {
+		err := client.Close()
+		if err != nil {
+			panic(err)
+		}
+	}(client)
+
+	session, err := client.NewSession()
+	if err != nil {
+		err2 := api.DeleteInstance(i.ID)
+		if err2 != nil {
+			panic(err2)
+		}
+		fmt.Println("Instance deleted")
+		panic(err)
+	}
+
+	defer func(session *ssh.Session) {
+		err := session.Close()
+		if err != nil {
+			panic(err)
+		}
+	}(session)
+
+	// run commands
+	cmds := []string{
+		"echo 'hello world'",
+		"apt update",
+		"apt install -y git",
+	}
+	for _, cmd := range cmds {
+		fmt.Println("Running command: ", cmd)
+		out, err := session.CombinedOutput(cmd)
+		if err != nil {
+			fmt.Println("Error running command: ", cmd)
+			fmt.Println(string(out))
+		} else {
+			fmt.Println(string(out))
+		}
+	}
 
 	for {
 		fmt.Print(">>")
