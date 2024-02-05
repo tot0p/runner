@@ -1,0 +1,7 @@
+{
+  "region": "ewr",
+  "plan": "vc2-1c-1gb",
+  "label": "ApiRunner",
+  "image_id": "docker",
+  "hostname": "runner"
+}
