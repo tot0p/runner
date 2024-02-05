@@ -7,6 +7,7 @@ import (
 )
 
 type Model struct {
+	api *vutlr.Vutlr
 }
 
 func (m Model) Init() tea.Cmd {
@@ -42,7 +43,7 @@ func main() {
 	api := vutlr.New()
 	api.SetAPIKey(env.Get("API_KEY"))
 
-	p := tea.NewProgram(Model{})
+	p := tea.NewProgram(Model{api: api})
 	if _, err := p.Run(); err != nil {
 		panic(err)
 	}
