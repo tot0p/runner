@@ -1,6 +1,9 @@
 package main
 
-import "github.com/tot0p/env"
+import (
+	"github.com/tot0p/env"
+	"runner/vutlr"
+)
 
 func init() {
 	err := env.Load()
@@ -10,5 +13,6 @@ func init() {
 }
 
 func main() {
-
+	vultr := vutlr.New()
+	vultr.SetAPIKey(env.Get("API_KEY"))
 }
