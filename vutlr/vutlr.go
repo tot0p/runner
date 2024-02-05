@@ -6,11 +6,14 @@ import (
 )
 
 type Vutlr struct {
-	APIKey string
+	APIKey  string
+	rootAPI string
 }
 
 func New() *Vutlr {
-	return &Vutlr{}
+	return &Vutlr{
+		rootAPI: "https://api.vultr.com/v2",
+	}
 }
 
 func (v *Vutlr) SetAPIKey(key string) {
