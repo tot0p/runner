@@ -17,19 +17,18 @@ func main() {
 	api := vutlr.New()
 	api.SetAPIKey(env.Get("API_KEY"))
 	/*
-	   	i, err := api.CreateInstance(`{
-	     "region": "ewr",
-	     "plan": "vc2-1c-2gb",
-	     "label": "ApiRunner",
-	     "os_id": 477,
-	     "hostname": "runner"
-	   }
-	   			`)
-	   	if err != nil {
-	   		panic(err)
-	   	}
-	   	fmt.Println(i.ID)
-
+		i, err := api.CreateInstance(`{
+		     "region": "ewr",
+		     "plan": "vc2-1c-2gb",
+		     "label": "ApiRunner",
+		     "os_id": 477,
+		     "hostname": "runner"
+		   }
+		   			`)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(i.ID)
 	*/
 
 	lst := api.ListInstances()
@@ -47,6 +46,25 @@ func main() {
 
 		fmt.Println(i.ID)
 		fmt.Println(i.Os)
+
+	*/
+	/*
+		for i.ServerStatus != "ok" {
+			i, err = api.GetInstance(i.ID)
+			if err != nil {
+				panic(err)
+			}
+			fmt.Println(i.ServerStatus)
+		}
+
+		if i.Label == "ApiRunner" {
+			fmt.Println("Instance created")
+			err := api.DeleteInstance(i.ID)
+			if err != nil {
+				panic(err)
+			}
+			fmt.Println("Instance deleted")
+		}
 
 	*/
 }

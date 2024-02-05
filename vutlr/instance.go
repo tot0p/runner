@@ -127,3 +127,23 @@ func (v *Vutlr) GetInstance(instanceID string) (Instance, error) {
 	}
 	return response.Instance, nil
 }
+
+// DeleteInstance = /v2/instances/{instance_id}
+
+func (v *Vutlr) DeleteInstance(instanceID string) error {
+	resp := v.request(newRequestNoBody(v.rootAPI+"/instances/"+instanceID, "DELETE"))
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			panic(err)
+		}
+	}(resp.Body)
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
+	if resp.StatusCode/100 != 2 {
+		return fmt.Errorf("error: %s", string(body))
+	}
+	return nil
+}
