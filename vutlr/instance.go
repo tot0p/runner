@@ -37,6 +37,7 @@ type Instance struct {
 	Features         []string `json:"features"`
 	Tags             []string `json:"tags"`
 	UserScheme       string   `json:"user_scheme"`
+	DefaultPassword  string   `json:"default_password"`
 }
 
 // ListIntances = /v2/instances

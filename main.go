@@ -32,6 +32,7 @@ func main() {
 	}
 
 	fmt.Println("Creating instance... ", i.ID)
+	fmt.Println("Password: ", i.DefaultPassword)
 
 	lastStatus := "none"
 	for i.ServerStatus != "ok" {
@@ -60,6 +61,8 @@ func main() {
 		fmt.Println("Instance deleted")
 		os.Exit(0)
 	}()
+
+	// connect to instance by ssh
 
 	for {
 		fmt.Print(">>")
