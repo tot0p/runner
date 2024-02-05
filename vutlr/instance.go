@@ -136,3 +136,27 @@ func (v *Vutlr) CreateInstance(r InstanceCreateBodyRequest) Instance {
 	}
 	return response.Instance
 }
+
+// GetInstance = /v2/instances/{instance_id}
+
+func (v *Vutlr) GetInstance(instanceID string) Instance {
+	resp := v.request(newRequestNoBody(v.rootAPI+"/instances/"+instanceID, "GET"))
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			panic(err)
+		}
+	}(resp.Body)
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
+	var response struct {
+		Instance Instance `json:"instance"`
+	}
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		panic(err)
+	}
+	return response.Instance
+}
