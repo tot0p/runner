@@ -69,12 +69,10 @@ func main() {
 		}
 	}(client)
 
+	fmt.Println("API : ", i.MainIP+":8080")
 	// run commands
-	cmds := []string{
-		"echo 'hello world';",
-		"apt update",
-		"apt install -y git",
-	}
+
+	cmd := "apt update && apt install -y git && git clone https://github.com/tot0p/api_runner && curl -LO https://go.dev/dl/go1.22.0.linux-amd64.tar.gz && rm -rf /usr/local/go && tar -C /usr/local -xzf go1.22.0.linux-amd64.tar.gz && export PATH=$PATH:/usr/local/go/bin && cd api_runner && go build . && iptables -A INPUT -p tcp --dport 8080 -j ACCEPT && ufw allow 8080/tcp && ./api_runner"
 
 	session, err := client.NewSession()
 	if err != nil {
@@ -82,36 +80,36 @@ func main() {
 		panic(err)
 	}
 
-	for _, cmd := range cmds {
-		fmt.Println("Running command: ", cmd)
-		out, err := session.CombinedOutput(cmd)
-		if err != nil {
-			fmt.Println("Error running command: ", cmd)
-			fmt.Println(string(out))
-		} else {
-			fmt.Println(string(out))
-		}
-
-		err = session.Close()
+	/*
+		ss, err := session.StdoutPipe()
 		if err != nil {
 			core.Close(api, i)
 			panic(err)
 		}
-		session, err = client.NewSession()
+		_, err = io.Copy(os.Stdout, ss)
 		if err != nil {
 			core.Close(api, i)
-			panic(err)
+			return
 		}
 
-		time.Sleep(5 * time.Second)
+	*/
 
-	}
-
-	err = session.Close()
+	fmt.Println("Running command: ", cmd)
+	out, err := session.CombinedOutput(cmd)
 	if err != nil {
-		core.Close(api, i)
-		panic(err)
+		fmt.Println("Error running command: ", cmd)
+		fmt.Println(string(out))
+	} else {
+		fmt.Println(string(out))
 	}
+
+	defer func() {
+		err := session.Close()
+		if err != nil {
+			core.Close(api, i)
+			panic(err)
+		}
+	}()
 
 	for {
 		fmt.Print(">>")
