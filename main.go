@@ -22,9 +22,7 @@ func init() {
 
 func main() {
 	api, pass, i := core.Connect()
-
 	fmt.Println("Instance created")
-
 	// handle ctrl+c
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
@@ -96,24 +94,12 @@ func main() {
 
 		err = session.Close()
 		if err != nil {
-			if err != nil {
-				err2 := api.DeleteInstance(i.ID)
-				if err2 != nil {
-					panic(err2)
-				}
-				fmt.Println("Instance deleted")
-			}
+			core.Close(api, i)
 			panic(err)
 		}
 		session, err = client.NewSession()
 		if err != nil {
-			if err != nil {
-				err2 := api.DeleteInstance(i.ID)
-				if err2 != nil {
-					panic(err2)
-				}
-				fmt.Println("Instance deleted")
-			}
+			core.Close(api, i)
 			panic(err)
 		}
 
@@ -123,13 +109,7 @@ func main() {
 
 	err = session.Close()
 	if err != nil {
-		if err != nil {
-			err2 := api.DeleteInstance(i.ID)
-			if err2 != nil {
-				panic(err2)
-			}
-			fmt.Println("Instance deleted")
-		}
+		core.Close(api, i)
 		panic(err)
 	}
 
@@ -138,21 +118,13 @@ func main() {
 		var cmd string = ""
 		_, err := fmt.Scanln(&cmd)
 		if err != nil {
-			err2 := api.DeleteInstance(i.ID)
-			if err2 != nil {
-				panic(err2)
-			}
-			fmt.Println("Instance deleted")
+			core.Close(api, i)
 			panic(err)
 		}
 		cmd = strings.ToLower(cmd)
 		switch cmd {
 		case "quit":
-			err := api.DeleteInstance(i.ID)
-			if err != nil {
-				panic(err)
-			}
-			fmt.Println("Instance deleted")
+			core.Close(api, i)
 			os.Exit(0)
 		default:
 			fmt.Println("Unknown command")
