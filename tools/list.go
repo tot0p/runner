@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/tot0p/env"
-	"runner/vutlr"
+	"runner/core/vutlr"
 )
 
 func init() {

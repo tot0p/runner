@@ -7,7 +7,7 @@ import (
 	"golang.org/x/crypto/ssh"
 	"os"
 	"os/signal"
-	"runner/vutlr"
+	"runner/core"
 	"strings"
 	"time"
 )
@@ -21,37 +21,7 @@ func init() {
 }
 
 func main() {
-	api := vutlr.New()
-	api.SetAPIKey(env.Get("API_KEY"))
-
-	js, err := os.ReadFile("vm.json")
-	if err != nil {
-		panic(err)
-	}
-	i, err := api.CreateInstance(string(js))
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println("Creating instance... ", i.ID)
-	fmt.Println("Password: ", i.DefaultPassword)
-	pass := i.DefaultPassword
-
-	lastStatus := "none"
-	count := 0
-	for count < 60 {
-		i, err = api.GetInstance(i.ID)
-		if err != nil {
-			panic(err)
-		}
-
-		time.Sleep(1 * time.Second)
-		count++
-		if i.ServerStatus != lastStatus {
-			fmt.Println(i.ServerStatus)
-			lastStatus = i.ServerStatus
-		}
-	}
+	api, pass, i := core.Connect()
 
 	fmt.Println("Instance created")
 
@@ -60,11 +30,7 @@ func main() {
 	signal.Notify(c, os.Interrupt)
 	go func() {
 		<-c
-		err := api.DeleteInstance(i.ID)
-		if err != nil {
-			panic(err)
-		}
-		fmt.Println("Instance deleted")
+		core.Close(api, i)
 		os.Exit(0)
 	}()
 
@@ -80,8 +46,8 @@ func main() {
 	}
 
 	var client *ssh.Client = nil
-	err = errors.New("not nil")
-	count = 0
+	err := errors.New("not nil")
+	count := 0
 
 	for err != nil && count < 5 {
 		client, err = ssh.Dial("tcp", host, config)
@@ -93,11 +59,7 @@ func main() {
 	}
 
 	if client == nil {
-		err2 := api.DeleteInstance(i.ID)
-		if err2 != nil {
-			panic(err2)
-		}
-		fmt.Println("Instance deleted")
+		core.Close(api, i)
 		panic(err)
 	}
 	fmt.Println("Connected to instance")
@@ -118,13 +80,7 @@ func main() {
 
 	session, err := client.NewSession()
 	if err != nil {
-		if err != nil {
-			err2 := api.DeleteInstance(i.ID)
-			if err2 != nil {
-				panic(err2)
-			}
-			fmt.Println("Instance deleted")
-		}
+		core.Close(api, i)
 		panic(err)
 	}
 
