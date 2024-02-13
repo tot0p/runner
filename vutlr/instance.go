@@ -40,6 +40,10 @@ type Instance struct {
 	DefaultPassword  string   `json:"default_password"`
 }
 
+func (i *Instance) String() string {
+	return fmt.Sprintf("ID: %s\nOS: %s\nRAM: %d\nDisk: %d\nMainIP: %s\nVcpuCount: %d\nRegion: %s\nPlan: %s\nDateCreated: %s\nStatus: %s\nAllowedBandwidth: %d\nNetmaskV4: %s\nGatewayV4: %s\nPowerStatus: %s\nServerStatus: %s\nV6Network: %s\nV6MainIP: %s\nV6NetworkSize: %d\nLabel: %s\nInternalIP: %s\nKVM: %s\nHostname: %s\nOsID: %d\nAppID: %d\nImageId: %s\nFireWallGroupID: %s\nFeatures: %v\nTags: %v\nUserScheme: %s\nDefaultPassword: %s\n", i.ID, i.Os, i.Ram, i.Disk, i.MainIP, i.VcpuCount, i.Region, i.Plan, i.DateCreated, i.Status, i.AllowedBandwidth, i.NetmaskV4, i.GatewayV4, i.PowerStatus, i.ServerStatus, i.V6Network, i.V6MainIP, i.V6NetworkSize, i.Label, i.InternalIP, i.KVM, i.Hostname, i.OsID, i.AppID, i.ImageId, i.FireWallGroupID, i.Features, i.Tags, i.UserScheme, i.DefaultPassword)
+}
+
 // ListIntances = /v2/instances
 
 type ListInstancesResponse struct {
