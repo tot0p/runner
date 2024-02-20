@@ -23,8 +23,6 @@ func Connect() (*vutlr.Vutlr, string, vutlr.Instance) {
 	}
 
 	fmt.Println("Creating instance... ", i.ID)
-	fmt.Println("IP: ", i.MainIP)
-	fmt.Println("Password: ", i.DefaultPassword)
 	pass := i.DefaultPassword
 
 	lastStatus := "none"
@@ -42,6 +40,8 @@ func Connect() (*vutlr.Vutlr, string, vutlr.Instance) {
 			lastStatus = i.ServerStatus
 		}
 	}
+	fmt.Println("IP: ", i.MainIP)
+	fmt.Println("Password: ", pass)
 
 	return api, pass, i
 }
