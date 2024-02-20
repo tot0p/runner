@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/tot0p/env"
 	"golang.org/x/crypto/ssh"
+	"io"
+	"net/http"
 	"os"
 	"os/signal"
 	"runner/core"
@@ -71,45 +73,58 @@ func main() {
 
 	fmt.Println("API : ", i.MainIP+":8080")
 	// run commands
+	go func() {
+		cmd := "apt update && apt install -y git && git clone https://github.com/tot0p/api_runner && curl -fsSL https://get.docker.com/ -o install-docker.sh && sh install-docker.sh && curl -LO https://go.dev/dl/go1.22.0.linux-amd64.tar.gz && rm -rf /usr/local/go && tar -C /usr/local -xzf go1.22.0.linux-amd64.tar.gz && export PATH=$PATH:/usr/local/go/bin && cd api_runner && go build . && ./api_runner"
 
-	cmd := "apt update && apt install -y git && git clone https://github.com/tot0p/api_runner && curl -LO https://go.dev/dl/go1.22.0.linux-amd64.tar.gz && rm -rf /usr/local/go && tar -C /usr/local -xzf go1.22.0.linux-amd64.tar.gz && export PATH=$PATH:/usr/local/go/bin && cd api_runner && go build . && iptables -A INPUT -p tcp --dport 8080 -j ACCEPT && ufw allow 8080/tcp && ./api_runner"
-
-	session, err := client.NewSession()
-	if err != nil {
-		core.Close(api, i)
-		panic(err)
-	}
-
-	/*
-		ss, err := session.StdoutPipe()
+		session, err := client.NewSession()
 		if err != nil {
 			core.Close(api, i)
 			panic(err)
 		}
-		_, err = io.Copy(os.Stdout, ss)
+
+		fmt.Println("Running command: ", cmd)
+		out, err := session.CombinedOutput(cmd)
 		if err != nil {
-			core.Close(api, i)
-			return
+			fmt.Println("Error running command: ", cmd)
+			fmt.Println(string(out))
+		} else {
+			fmt.Println(string(out))
 		}
 
-	*/
-
-	fmt.Println("Running command: ", cmd)
-	out, err := session.CombinedOutput(cmd)
-	if err != nil {
-		fmt.Println("Error running command: ", cmd)
-		fmt.Println(string(out))
-	} else {
-		fmt.Println(string(out))
-	}
-
-	defer func() {
-		err := session.Close()
-		if err != nil {
-			core.Close(api, i)
-			panic(err)
-		}
+		defer func() {
+			err := session.Close()
+			if err != nil {
+				core.Close(api, i)
+				panic(err)
+			}
+		}()
 	}()
+
+	deploy := false
+
+	for !deploy {
+		// send request to api
+		req, err := http.NewRequest("GET", "http://"+i.MainIP+":80/ping", nil)
+		if err != nil {
+			core.Close(api, i)
+			panic(err)
+		}
+		resp, err := http.DefaultClient.Do(req)
+		if resp.Body != nil {
+			var body []byte
+			body, err = io.ReadAll(resp.Body)
+
+			defer func() {
+				err := resp.Body.Close()
+				if err != nil {
+					core.Close(api, i)
+					panic(err)
+				}
+			}()
+			fmt.Println(string(body))
+			deploy = true
+		}
+	}
 
 	for {
 		fmt.Print(">>")
