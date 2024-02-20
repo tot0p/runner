@@ -74,7 +74,7 @@ func main() {
 	fmt.Println("API : ", i.MainIP+":8080")
 	// run commands
 	go func() {
-		cmd := "apt update && apt install -y git && git clone https://github.com/tot0p/api_runner && curl -fsSL https://get.docker.com/ -o install-docker.sh && sh install-docker.sh && curl -LO https://go.dev/dl/go1.22.0.linux-amd64.tar.gz && rm -rf /usr/local/go && tar -C /usr/local -xzf go1.22.0.linux-amd64.tar.gz && export PATH=$PATH:/usr/local/go/bin && cd api_runner && go build . && ./api_runner"
+		cmd := "apt update && apt install -y git && git clone https://github.com/tot0p/api_runner && curl -fsSL https://get.docker.com/ -o install-docker.sh && sh install-docker.sh && curl -LO https://go.dev/dl/go1.22.0.linux-amd64.tar.gz && rm -rf /usr/local/go && tar -C /usr/local -xzf go1.22.0.linux-amd64.tar.gz && export PATH=$PATH:/usr/local/go/bin && apt-get install -y gnupg && wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | apt-key add -  && echo \"deb http://repo.mongodb.org/apt/debian buster/mongodb-org/6.0 main\" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list && apt-get update && apt-get install -y mongodb-org && systemctl start mongod && cd api_runner && go build . && ./api_runner"
 
 		session, err := client.NewSession()
 		if err != nil {
