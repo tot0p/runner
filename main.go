@@ -175,10 +175,15 @@ func main() {
 			}
 			// run commands
 			ownapi.Clone(cmd, &i)
-
+		case "list":
+			ownapi.List(cmd, &i)
 		case "quit", "exit":
 			core.Close(api, i)
 			os.Exit(0)
+		case "help":
+			fmt.Println("clone <url> - clone a repository")
+			fmt.Println("list - list running containers")
+			fmt.Println("quit, exit - close the program")
 		default:
 			fmt.Println("Unknown command")
 		}

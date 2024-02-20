@@ -20,7 +20,7 @@ func Clone(cmd []string, i *vutlr.Instance) {
 	body := strings.NewReader(fmt.Sprintf("{\"link\":\"%s\"}", cmd[1]))
 	req, err := http.NewRequest("POST", "http://"+i.MainIP+":80/vm", body)
 	if err != nil {
-		fmt.Println(err.Error() + "1")
+		fmt.Println(err.Error())
 		return
 	}
 	req.Header.Set("Content-Type", "application/json")
