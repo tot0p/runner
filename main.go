@@ -186,7 +186,10 @@ func main() {
 		case "help":
 			fmt.Println("clone <url> - clone a repository")
 			fmt.Println("list - list running containers")
+			fmt.Println("close <instance_id> - close a container")
 			fmt.Println("quit, exit - close the program")
+		case "logs":
+			ownapi.Logs(cmd, &i)
 		default:
 			fmt.Println("Unknown command")
 		}

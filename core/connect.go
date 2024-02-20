@@ -36,7 +36,6 @@ func Connect() (*vutlr.Vutlr, string, vutlr.Instance) {
 		time.Sleep(1 * time.Second)
 		count++
 		if i.ServerStatus != lastStatus {
-			fmt.Println(i.ServerStatus)
 			lastStatus = i.ServerStatus
 		}
 	}
