@@ -10,9 +10,28 @@ import (
 	"os"
 	"os/signal"
 	"runner/core"
+	"runner/core/ownapi"
 	"strings"
 	"time"
 )
+
+type newline struct{ tok string }
+
+func (n *newline) Scan(state fmt.ScanState, verb rune) error {
+	tok, err := state.Token(false, func(r rune) bool {
+		return r != '\n'
+	})
+	if err != nil {
+		return err
+	}
+	if _, _, err := state.ReadRune(); err != nil {
+		if len(tok) == 0 {
+			panic(err)
+		}
+	}
+	n.tok = string(tok)
+	return nil
+}
 
 func init() {
 	err := env.Load()
@@ -138,15 +157,26 @@ func main() {
 
 	for {
 		fmt.Print(">>")
-		var cmd string = ""
-		_, err := fmt.Scanln(&cmd)
+		var temp newline
+		_, err := fmt.Scan(&temp)
 		if err != nil {
 			core.Close(api, i)
 			panic(err)
 		}
-		cmd = strings.ToLower(cmd)
-		switch cmd {
-		case "quit":
+		temp.tok = strings.TrimSpace(temp.tok)
+		temp.tok = strings.ReplaceAll(temp.tok, "\n", "")
+		temp.tok = strings.ToLower(temp.tok)
+		cmd := strings.Split(temp.tok, " ")
+		switch cmd[0] {
+		case "clone":
+			if len(cmd) != 2 {
+				fmt.Println("Usage: clone <url>")
+				continue
+			}
+			// run commands
+			ownapi.Clone(cmd, &i)
+
+		case "quit", "exit":
 			core.Close(api, i)
 			os.Exit(0)
 		default:
