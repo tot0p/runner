@@ -102,27 +102,37 @@ func main() {
 
 	deploy := false
 
+	req, err := http.NewRequest("GET", "http://"+i.MainIP+":80/ping", nil)
+	if err != nil {
+		core.Close(api, i)
+		panic(err)
+	}
+
 	for !deploy {
 		// send request to api
-		req, err := http.NewRequest("GET", "http://"+i.MainIP+":80/ping", nil)
+
+		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
+			if strings.Contains(err.Error(), "dial tcp") {
+				time.Sleep(2 * time.Second)
+				continue
+			}
 			core.Close(api, i)
 			panic(err)
 		}
-		resp, err := http.DefaultClient.Do(req)
 		if resp.Body != nil {
 			var body []byte
 			body, err = io.ReadAll(resp.Body)
 
-			defer func() {
-				err := resp.Body.Close()
-				if err != nil {
-					core.Close(api, i)
-					panic(err)
-				}
-			}()
-			fmt.Println(string(body))
-			deploy = true
+			if string(body) == "{\n    \"message\": \"pong\"\n}" {
+				fmt.Println("Deployed")
+				deploy = true
+			}
+		}
+		err = resp.Body.Close()
+		if err != nil {
+			core.Close(api, i)
+			panic(err)
 		}
 	}
 
