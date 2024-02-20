@@ -190,44 +190,12 @@ func main() {
 			fmt.Println("quit, exit - close the program")
 		case "logs":
 			ownapi.Logs(cmd, &i)
+		case "ip":
+			fmt.Println(i.MainIP)
+		case "pass":
+			fmt.Println(pass)
 		default:
 			fmt.Println("Unknown command")
 		}
 	}
-
-	/*
-		lst := api.ListInstances()
-
-		id := lst.Instances[0].ID
-
-		fmt.Println(id)
-
-		i, err := api.GetInstance(id)
-		if err != nil {
-			panic(err)
-		}
-
-		fmt.Println(i.ID)
-		fmt.Println(i.Os)
-
-	*/
-	/*
-		for i.ServerStatus != "ok" {
-			i, err = api.GetInstance(i.ID)
-			if err != nil {
-				panic(err)
-			}
-			fmt.Println(i.ServerStatus)
-		}
-
-		if i.Label == "ApiRunner" {
-			fmt.Println("Instance created")
-			err := api.DeleteInstance(i.ID)
-			if err != nil {
-				panic(err)
-			}
-			fmt.Println("Instance deleted")
-		}
-
-	*/
 }

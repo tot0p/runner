@@ -9,14 +9,14 @@ import (
 )
 
 type Item struct {
-	containerID     string `bson:"containerID"`
-	repositoryURL   string `bson:"repositoryURL"`
-	creationDate    string `bson:"creationDate"`
-	destructionDate string `bson:"destructionDate"`
+	ContainerID     string `json:"containerID"`
+	RepositoryURL   string `json:"repositoryURL"`
+	CreationDate    string `json:"creationDate"`
+	DestructionDate string `json:"destructionDate"`
 }
 
 func (i Item) String() string {
-	return fmt.Sprintf("ContainerID: %s\nRepositoryURL: %s\nCreationDate: %s\nDestructionDate: %s\n", i.containerID, i.repositoryURL, i.creationDate, i.destructionDate)
+	return fmt.Sprintf("ContainerID: %s\nRepositoryURL: %s\nCreationDate: %s\nDestructionDate: %s\n", i.ContainerID, i.RepositoryURL, i.CreationDate, i.DestructionDate)
 }
 
 func Logs(cmd []string, i *vutlr.Instance) {
