@@ -57,6 +57,7 @@ type ListInstancesResponse struct {
 	} `json:"meta"`
 }
 
+// ListInstances lists the instances in the account
 func (v *Vutlr) ListInstances() ListInstancesResponse {
 	resp := v.request(newRequestNoBody(v.rootAPI+"/instances", "GET"))
 	defer func(Body io.ReadCloser) {
@@ -79,6 +80,7 @@ func (v *Vutlr) ListInstances() ListInstancesResponse {
 
 // CreateInstance = /v2/instances
 
+// CreateInstance creates a new instance
 func (v *Vutlr) CreateInstance(jsonBody string) (Instance, error) {
 	bodyR := io.NopCloser(strings.NewReader(jsonBody))
 	resp := v.request(newRequest(v.rootAPI+"/instances", "POST", bodyR))
@@ -107,6 +109,7 @@ func (v *Vutlr) CreateInstance(jsonBody string) (Instance, error) {
 
 // GetInstance = /v2/instances/{instance_id}
 
+// GetInstance gets the instance with the given ID
 func (v *Vutlr) GetInstance(instanceID string) (Instance, error) {
 	resp := v.request(newRequestNoBody(v.rootAPI+"/instances/"+instanceID, "GET"))
 	defer func(Body io.ReadCloser) {
@@ -135,6 +138,7 @@ func (v *Vutlr) GetInstance(instanceID string) (Instance, error) {
 
 // DeleteInstance = /v2/instances/{instance_id}
 
+// DeleteInstance deletes the instance with the given ID
 func (v *Vutlr) DeleteInstance(instanceID string) error {
 	resp := v.request(newRequestNoBody(v.rootAPI+"/instances/"+instanceID, "DELETE"))
 	defer func(Body io.ReadCloser) {

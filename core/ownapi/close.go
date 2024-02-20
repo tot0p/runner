@@ -7,6 +7,7 @@ import (
 	"runner/core/vutlr"
 )
 
+// Close closes the VM
 func Close(cmd []string, i *vutlr.Instance) {
 	if len(cmd) != 2 {
 		fmt.Println("Usage: close <instance_id>")

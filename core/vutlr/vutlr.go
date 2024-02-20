@@ -42,6 +42,7 @@ func newRequestNoBody(url string, method string) request {
 	}
 }
 
+// request sends a request to the API with the Bearer token
 func (v *Vutlr) request(r request) *http.Response {
 	var bearer = "Bearer " + v.APIKey
 

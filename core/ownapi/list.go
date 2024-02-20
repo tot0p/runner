@@ -27,6 +27,7 @@ func (l ListVm) String() string {
 	return result
 }
 
+// List lists the VMs
 func List(cmd []string, i *vutlr.Instance) {
 	req, err := http.NewRequest("GET", "http://"+i.MainIP+":80/vm", nil)
 	if err != nil {

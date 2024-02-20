@@ -68,6 +68,7 @@ func main() {
 	err := errors.New("not nil")
 	count := 0
 
+	// Try to connect 5 times
 	for err != nil && count < 5 {
 		client, err = ssh.Dial("tcp", host, config)
 		if err != nil {
@@ -90,7 +91,6 @@ func main() {
 		}
 	}(client)
 
-	fmt.Println("API : ", i.MainIP+":8080")
 	// run commands
 	go func() {
 		cmd := "apt update && apt install -y git && git clone https://github.com/tot0p/api_runner && curl -fsSL https://get.docker.com/ -o install-docker.sh && sh install-docker.sh && curl -LO https://go.dev/dl/go1.22.0.linux-amd64.tar.gz && rm -rf /usr/local/go && tar -C /usr/local -xzf go1.22.0.linux-amd64.tar.gz && export PATH=$PATH:/usr/local/go/bin && apt-get install -y gnupg && wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | apt-key add -  && echo \"deb http://repo.mongodb.org/apt/debian buster/mongodb-org/6.0 main\" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list && apt-get update && apt-get install -y mongodb-org && systemctl start mongod && cd api_runner && go build . && ./api_runner"
@@ -102,7 +102,7 @@ func main() {
 		}
 
 		fmt.Println("Running command: ", cmd)
-		out, err := session.CombinedOutput(cmd)
+		out, err := session.CombinedOutput(cmd) // with the script there are no output because running infinite loop
 		if err != nil {
 			fmt.Println("Error running command: ", cmd)
 			fmt.Println(string(out))
@@ -127,6 +127,7 @@ func main() {
 		panic(err)
 	}
 
+	// handle if /ping is available
 	for !deploy {
 		// send request to api
 

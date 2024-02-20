@@ -16,6 +16,7 @@ type CloneResponse struct {
 	Ports   map[string]int `json:"ports"`
 }
 
+// Clone clones the VM
 func Clone(cmd []string, i *vutlr.Instance) {
 	body := strings.NewReader(fmt.Sprintf("{\"link\":\"%s\"}", cmd[1]))
 	req, err := http.NewRequest("POST", "http://"+i.MainIP+":80/vm", body)

@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// Connect creates a new instance and returns the API, password and instance
 func Connect() (*vutlr.Vutlr, string, vutlr.Instance) {
 	api := vutlr.New()
 	api.SetAPIKey(env.Get("API_KEY"))
@@ -22,6 +23,7 @@ func Connect() (*vutlr.Vutlr, string, vutlr.Instance) {
 	}
 
 	fmt.Println("Creating instance... ", i.ID)
+	fmt.Println("IP: ", i.MainIP)
 	fmt.Println("Password: ", i.DefaultPassword)
 	pass := i.DefaultPassword
 
@@ -44,6 +46,7 @@ func Connect() (*vutlr.Vutlr, string, vutlr.Instance) {
 	return api, pass, i
 }
 
+// Close deletes the instance
 func Close(api *vutlr.Vutlr, i vutlr.Instance) {
 	err := api.DeleteInstance(i.ID)
 	if err != nil {

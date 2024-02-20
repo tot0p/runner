@@ -7,6 +7,7 @@ import (
 	"runtime"
 )
 
+// Openbrowser opens the default web browser
 func Openbrowser(url string) {
 	var err error
 	switch runtime.GOOS {
