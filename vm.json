@@ -1,7 +1,0 @@
-{
-  "region": "ewr",
-  "plan": "vc2-1c-2gb",
-  "label": "ApiRunner",
-  "os_id": 477,
-  "hostname": "runner"
-}
