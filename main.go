@@ -177,6 +177,8 @@ func main() {
 			ownapi.Clone(cmd, &i)
 		case "list":
 			ownapi.List(cmd, &i)
+		case "close":
+			ownapi.Close(cmd, &i)
 		case "quit", "exit":
 			core.Close(api, i)
 			os.Exit(0)
