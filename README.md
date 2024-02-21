@@ -42,3 +42,7 @@ Little update coming soon, for the project to be more user-friendly and beautifu
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
+
+## Contributores
+
+[![](https://contributors-img.web.app/image?repo=tot0p/runner)](https://github.com/tot0p/runner/graphs/contributors)
